@@ -38,7 +38,8 @@ import { useRouter } from "next/navigation";
 
 export default function ChatPage() {
   const router = useRouter();
-  if (!localStorage.getItem("USER_ID")) return router.push("/");
+  const [USERID, setUSERID] = useState();
+
   const [isNewMessageOpen, setIsNewMessageOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [haveChat, setHaveChat] = useState(false);
@@ -47,8 +48,19 @@ export default function ChatPage() {
   const [activeChatID, setActiveChatID] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // useEffect(() => {
+  //   if (!USERID) {
+  //     router.push("/");
+  //   }
+  // }, [USERID]);
+
+  useEffect(() => {
+    if (window.localStorage.getItem("USER_ID")) {
+      setUSERID(window.localStorage.getItem("USER_ID"));
+    }
+  }, []);
   const newChat = useQuery(api.chat.newChat, {
-    currentUser: localStorage.getItem("USER_ID"),
+    currentUser: USERID,
   });
   const newChatID = useMutation(api.chat.createChat);
   const deleteChat = useMutation(api.chat.deleteChat);
@@ -57,7 +69,7 @@ export default function ChatPage() {
   const fetchUserChat = useQuery(api.chat.allUserChat);
   const fetchUsers = useQuery(api.user.allUser);
   const loadChatted = useQuery(api.chat.loadChatted, {
-    user_id: localStorage.getItem("USER_ID") || "",
+    user_id: USERID || "",
   });
 
   const handleDeleteChat = (id) => {
@@ -75,7 +87,7 @@ export default function ChatPage() {
   const ChatSelected = async (e) => {
     setActiveChatID("");
     setIsSidebarOpen(false);
-    const arr = [localStorage.getItem("USER_ID"), e];
+    const arr = [USERID, e];
     let haveChat = false;
     let chattyID;
     for (const item of fetchChat) {
@@ -123,7 +135,7 @@ export default function ChatPage() {
   };
 
   const deleteUser = async (e) => {
-    const arr = [localStorage.getItem("USER_ID"), e];
+    const arr = [USERID, e];
     let chattyID;
     for (const item of fetchChat) {
       const chatID = item._id;
@@ -155,7 +167,7 @@ export default function ChatPage() {
     <div className="flex flex-col h-screen">
       {/* Header */}
       <div className="w-full p-4 border-b flex justify-between items-center">
-        <h2 className="font-semibold app-title">Chats</h2>
+        <h2 className="font-semibold app-title">{`Chats`}</h2>
         <div className="flex items-center space-x-2">
           <Dialog open={isNewMessageOpen} onOpenChange={setIsNewMessageOpen}>
             <DialogTrigger asChild>
@@ -196,7 +208,7 @@ export default function ChatPage() {
             variant="ghost"
             size="icon"
             onClick={(e) => {
-              localStorage.removeItem("USER_ID");
+              window.localStorage.removeItem("USER_ID");
               setTimeout(() => {
                 router.push("/");
               }, 1000);
@@ -329,7 +341,7 @@ const Conversation = (props) => {
     e.preventDefault();
     await sendMessage({
       chat_id: props.chatID,
-      user_id: localStorage.getItem("USER_ID"),
+      user_id: USERID,
       message: message,
     });
     setMessage("");
@@ -434,7 +446,13 @@ const NewChat = (props) => {
       }}
     >
       <Avatar className="h-10 w-10">
-        <AvatarImage src={`https://i.pravatar.cc/150?img=${props.index}`} />
+        <AvatarImage
+          src={
+            props.object?.url == ""
+              ? "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+              : props.object?.url
+          }
+        />
         <AvatarFallback>{props.object.username.charAt(0)}</AvatarFallback>
       </Avatar>
       <div className="ml-4 flex-grow">

@@ -10,7 +10,17 @@ export const newChat = query({
       .query("Users")
       .filter((q) => q.neq(q.field("_id"), args.currentUser))
       .collect();
-    return users;
+
+    let arr = await Promise.all(
+      users.map(async (item) => {
+        let url = "";
+        if (item.avatar !== "") {
+          url = await ctx.storage.getUrl(item.avatar);
+        }
+        return { ...item, url: url };
+      })
+    );
+    return arr;
   },
 });
 

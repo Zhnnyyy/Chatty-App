@@ -19,15 +19,28 @@ import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const router = useRouter();
-  if (!localStorage.getItem("USER_ID")) return router.push("/");
+  const [USERID, setUSERID] = useState("");
+
   const [isEditing, setIsEditing] = useState(false);
   const [tempImage, settempImage] = useState(
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
   );
   const [profileImage, setProfileImage] = useState(null);
   const profileInformation = useQuery(api.user.userInfo, {
-    userID: localStorage.getItem("USER_ID"),
+    userID: USERID,
   });
+
+  // useEffect(() => {
+  //   if (!USERID) {
+  //     router.push("/");
+  //   }
+  // }, [USERID]);
+
+  useEffect(() => {
+    if (window.localStorage.getItem("USER_ID")) {
+      setUSERID(window.localStorage.getItem("USER_ID"));
+    }
+  }, []);
   const [frmdata, setFormData] = useState({
     email: "",
     username: "",
@@ -60,7 +73,7 @@ export default function ProfilePage() {
     let newObj = {
       ...frmdata,
       avatar: storageId,
-      currentID: localStorage.getItem("USER_ID"),
+      currentID: USERID,
     };
     const update = await updateProfile(newObj);
     if (update) {
@@ -74,7 +87,6 @@ export default function ProfilePage() {
       email: profileInformation?.email,
       username: profileInformation?.username,
     });
-    console.log(profileInformation);
   }, [profileInformation]);
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

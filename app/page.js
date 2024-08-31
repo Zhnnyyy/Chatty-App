@@ -14,10 +14,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 export default function AuthPage() {
   const router = useRouter();
-  if (localStorage.getItem("USER_ID")) return router.push("/chat");
+  const [USERID, setUSERID] = useState();
+
   const createUser = useMutation(api.user.createUser);
   const [regForm, setRegForm] = useState({
     username: "",
@@ -25,6 +27,18 @@ export default function AuthPage() {
     password: "",
     avatar: "",
   });
+
+  // useEffect(() => {
+  //   if (USERID) {
+  //     router.push("/chat");
+  //   }
+  // }, [USERID]);
+
+  useEffect(() => {
+    if (window.localStorage.getItem("USER_ID")) {
+      setUSERID(window.localStorage.getItem("USER_ID"));
+    }
+  }, []);
 
   const [loginForm, setLoginForm] = useState({
     email: "",
@@ -50,15 +64,11 @@ export default function AuthPage() {
 
   const loginUser = (e) => {
     e.preventDefault();
-    if (
-      regForm.email === "" ||
-      regForm.password === "" ||
-      regForm.username === ""
-    ) {
+    if (loginForm.email === "" || loginForm.password === "") {
       return alert("Please fill all fields");
     }
     if (login_user?.length > 0) {
-      localStorage.setItem("USER_ID", login_user[0]._id);
+      window.localStorage.setItem("USER_ID", login_user[0]._id);
       router.push("/chat");
     } else {
       alert("Incorrect Credentials");
@@ -88,7 +98,7 @@ export default function AuthPage() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Welcome</CardTitle>
+          <CardTitle>{`Welcome`}</CardTitle>
           <CardDescription>
             Login or create an account to get started
           </CardDescription>
