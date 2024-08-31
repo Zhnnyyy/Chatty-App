@@ -294,7 +294,7 @@ const Chatted = (props) => {
               : props.object.url
           }
         />
-        <AvatarFallback>{"conversation.name.charAt(0)"}</AvatarFallback>
+        <AvatarFallback>{props.object.username.charAt(0)}</AvatarFallback>
       </Avatar>
       <div className="ml-4 flex-grow">
         <p className="text-sm font-medium">{props.object.username}</p>
@@ -364,7 +364,7 @@ const Conversation = (props) => {
             }
           />
 
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback>{props.object[0].username.charAt(0)}</AvatarFallback>
         </Avatar>
         <span className="ml-4 font-medium">{props.object[0]?.username}</span>
       </div>
