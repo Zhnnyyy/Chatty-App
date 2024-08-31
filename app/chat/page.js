@@ -341,7 +341,7 @@ const Conversation = (props) => {
     e.preventDefault();
     await sendMessage({
       chat_id: props.chatID,
-      user_id: USERID,
+      user_id: localStorage.getItem("USER_ID"),
       message: message,
     });
     setMessage("");
